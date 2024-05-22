@@ -3,6 +3,7 @@ import { createMaterialBottomTabNavigator } from '@react-navigation/material-bot
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import PantallaPrincipal from './PantallaPrincipal';
 import UsuariosScreen from './UsuariosScreen';
+import Mensajes from './Mensajes';
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -48,7 +49,22 @@ class Tabs extends Component {
             headerShown: false,
           }}
         />
-        
+        <Tab.Screen
+          name="Mensajes"
+          component={Mensajes}
+          initialParams={{ nombre }}
+          options={{
+            tabBarLabel: 'Mensajes',
+            tabBarIcon: ({  size = 30 }) => (
+              <MaterialCommunityIcons
+                name="email"
+                color={'white'}
+                size={size}
+              />
+            ),
+            headerShown: false,
+          }}
+        />
         
       </Tab.Navigator>
     );
