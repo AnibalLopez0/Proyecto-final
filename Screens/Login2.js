@@ -14,6 +14,23 @@ class Login2 extends Component {
     };
   }
 
+  registrarUsuario = async (codigo, nombre) => {
+    try {
+        const response = await fetch('https://new-fashioned-bulk.000webhostapp.com/Login.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `codigo=${codigo}&nombre=${nombre}`,
+        });
+
+        const result = await response.text();
+        console.log(result);
+    } catch (error) {
+        console.error('Error:', error);
+    }
+};
+
   sendData = async () => {
     const { codigo, nip } = this.state;
 
@@ -38,7 +55,9 @@ class Login2 extends Component {
           await AsyncStorage.setItem('nombre', separado[2]);
           await AsyncStorage.setItem('carrera', separado[3]);
           await AsyncStorage.setItem('campus', separado[4]);
-          
+
+          //llamar registrar usuario
+          await this.registrarUsuario(codigo,separado[2]);
           // Actualizar el estado de autenticación después de guardar los datos en AsyncStorage
           this.setState({ isAuthenticated: true });
           RNRestart.Restart();
