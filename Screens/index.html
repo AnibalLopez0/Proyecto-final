@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #000; /* Fondo negro */
+            color: #fff; /* Texto blanco para mejor legibilidad */
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+        .message-form {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .message-form input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px 0 0 5px;
+        }
+        .message-form button {
+            padding: 10px 20px;
+            border: 1px solid #ccc;
+            border-left: 0;
+            background-color: #C72B62;
+            color: white;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+        }
+        .message-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .message-list li {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #ffffff;
+        }
+        .message-list button {
+            background-color: #f70404;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gestión de Mensajes</h1>
+        <div class="message-form">
+            <input type="text" id="mensaje" placeholder="Escribe un mensaje...">
+            <button onclick="addMessage()">Agregar</button>
+        </div>
+        <ul class="message-list" id="message-list"></ul>
+    </div>
+
+    <script>
+        function fetchMessages() {
+            fetch('https://new-fashioned-bulk.000webhostapp.com/Mensajes.php')
+                .then(response => response.json())
+                .then(data => {
+                    const messageList = document.getElementById('message-list');
+                    messageList.innerHTML = '';
+                    if (data.length > 0) {
+                        data.forEach(message => {
+                            const listItem = document.createElement('li');
+                            listItem.innerHTML = `
+                                ${message.mensaje} <button onclick="deleteMessage(${message.id})">Eliminar</button>
+                            `;
+                            messageList.appendChild(listItem);
+                        });
+                    } else {
+                        messageList.innerHTML = '<li>No se encontraron mensajes</li>';
+                    }
+                });
+        }
+
+        function addMessage() {
+            const mensaje = document.getElementById('mensaje').value;
+            if (!mensaje) {
+                alert('Por favor, escribe un mensaje.');
+                return;
+            }
+            fetch('https://new-fashioned-bulk.000webhostapp.com/AgregarMensaje.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `mensaje=${encodeURIComponent(mensaje)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.nuevo_mensaje) {
+                    document.getElementById('mensaje').value = '';
+                    fetchMessages();
+                } else {
+                    alert('Error al agregar el mensaje: ' + data.error);
+                }
+            });
+        }
+
+        function deleteMessage(id) {
+            fetch(`https://new-fashioned-bulk.000webhostapp.com/EliminarMensaje.php?id=${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.mensaje) {
+                        fetchMessages();
+                    } else {
+                        alert('Error al eliminar el mensaje: ' + data.error);
+                    }
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchMessages();
+        });
+    </script>
+</body>
+</html>
